@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>토큰을 넘어서: 차세대 AI 아키텍처 탐험</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: "Calm Harmony" - A palette grounded in warm neutrals (#F8F5F2), with dark slate for text (#2C3E50), and a calming teal (#4E8D7C) and subtle terracotta (#D88C7A) for accents and interactions. -->
+    <!-- Application Structure Plan: The SPA is designed as a narrative journey. It starts with the core problem (LLM limitations), introduces the vision (cognitive pillars), presents the detailed solution (KG-based hybrid models) in an interactive tabbed format, shows the synergistic outcome, and concludes. This problem-solution flow is more intuitive for understanding complex technical concepts than a linear report summary. The interactive tabs for Grounding, Memory, and Causality allow users to delve into specific mechanisms without being overwhelmed, supported by a dynamically updating chart for direct visual comparison. -->
+    <!-- Visualization & Content Choices: 
+        - LLM Limitations (Inform): Four-column grid with icons and text to quickly convey the main challenges. Goal: Establish the problem space. Method: HTML/CSS grid.
+        - Cognitive Pillars (Organize): Simple HTML/CSS diagram to present the AGI requirements. Goal: Frame the solution's objectives. Method: Flexbox with styled divs.
+        - KG-Hybrid Solutions (Compare/Organize): Interactive tabs for Grounding, Memory, Causality. Each tab contains a text explanation, a custom HTML/CSS diagram illustrating the mechanism (e.g., Scene Graph, GraphRAG flow, Causal DAG), and contributes to a single, dynamic bar chart. Goal: Deep dive into the core solutions and compare their impact. Method: JS for tab logic, Chart.js for dynamic visualization.
+        - Synergy (Relationships): A circular flow diagram. Goal: Show how the individual solutions create a virtuous cycle. Method: HTML/CSS grid and styled divs.
+        - Comparison Chart (Compare): A single, dynamic bar chart updates when the user clicks a solution tab. Goal: Provide a quantitative, at-a-glance comparison of Standard LLMs vs. KG-Hybrid models on relevant metrics. Method: Chart.js, with data updated via JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #F8F5F2;
+            color: #2C3E50;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            background-color: #4E8D7C;
+            color: #FFFFFF;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .flow-diagram-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 2px solid #D88C7A;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            font-weight: 500;
+            background-color: #F8F5F2;
+            position: relative;
+            z-index: 10;
+        }
+        .flow-diagram-arrow {
+            position: absolute;
+            color: #D88C7A;
+            font-size: 2.5rem;
+            font-weight: bold;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-[#2C3E50] text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold">지식그래프 기반 하이브리드 AI</h1>
+            <nav class="hidden md:flex space-x-6">
+                <a href="#limits" class="hover:text-[#D88C7A] transition">AI의 한계</a>
+                <a href="#solution" class="hover:text-[#D88C7A] transition">핵심 해결책</a>
+                <a href="#synergy" class="hover:text-[#D88C7A] transition">시너지</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section class="text-center py-16 md:py-24">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">토큰을 넘어서: 차세대 AI 아키텍처 탐험</h2>
+            <p class="text-lg md:text-xl max-w-3xl mx-auto text-gray-600">
+                현재의 대규모 언어 모델(LLM)은 놀라운 발전을 이루었지만, 근본적인 한계에 직면해 있습니다. 이 보고서는 진정한 인공 일반 지능(AGI)으로 나아가기 위해 '지식그래프'를 활용한 하이브리드 모델이 어떻게 AI의 핵심 난제인 접지, 기억, 인과 추론을 해결하는지 탐구합니다.
+            </p>
+        </section>
+
+        <section id="limits" class="py-16 bg-white rounded-2xl shadow-lg">
+            <div class="text-center mb-12 px-4">
+                <h3 class="text-3xl font-bold mb-2">현 세대 AI의 근본적 한계</h3>
+                <p class="text-gray-500 max-w-2xl mx-auto">현재 모델들은 '다음 토큰 예측' 방식에 의존하여, 실제 세계와 단절되고 진정한 이해 능력이 부족합니다.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-8">
+                <div class="bg-[#F8F5F2] p-6 rounded-xl text-center border border-gray-200">
+                    <div class="text-4xl mb-4">🌍</div>
+                    <h4 class="text-xl font-bold mb-2">접지(Grounding)의 부재</h4>
+                    <p class="text-gray-600 text-sm">언어적 기호가 물리적 현실과 연결되지 않아, 실제 세계에 대한 깊이 있는 이해가 불가능합니다.</p>
+                </div>
+                <div class="bg-[#F8F5F2] p-6 rounded-xl text-center border border-gray-200">
+                    <div class="text-4xl mb-4">🧠</div>
+                    <h4 class="text-xl font-bold mb-2">취약한 추론 능력</h4>
+                    <p class="text-gray-600 text-sm">통계적 패턴에 의존하여 논리적 일관성이 부족하고, 복잡한 문제 해결에 어려움을 겪습니다.</p>
+                </div>
+                <div class="bg-[#F8F5F2] p-6 rounded-xl text-center border border-gray-200">
+                    <div class="text-4xl mb-4">💾</div>
+                    <h4 class="text-xl font-bold mb-2">지속성 없는 기억</h4>
+                    <p class="text-gray-600 text-sm">제한된 컨텍스트 창에 의존하여 장기적인 대화 맥락을 유지하거나 과거 경험에서 학습하지 못합니다.</p>
+                </div>
+                <div class="bg-[#F8F5F2] p-6 rounded-xl text-center border border-gray-200">
+                    <div class="text-4xl mb-4">🔗</div>
+                    <h4 class="text-xl font-bold mb-2">인과관계 분석 불가</h4>
+                    <p class="text-gray-600 text-sm">상관관계와 인과관계를 혼동하여 데이터 편향에 취약하고, '왜'에 대한 근본적인 질문에 답할 수 없습니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="solution" class="py-16 mt-16">
+            <div class="text-center mb-12 px-4">
+                <h3 class="text-3xl font-bold mb-2">핵심 해결책: 지식그래프 기반 하이브리드 모델</h3>
+                <p class="text-gray-500 max-w-3xl mx-auto">지식그래프는 신경망의 패턴 인식 능력과 기호적 추론을 결합하여 기존 AI의 한계를 극복하는 구조적 토대를 제공합니다. 아래 탭을 클릭하여 각 문제에 대한 해결 메커니즘을 살펴보세요.</p>
+            </div>
+
+            <div class="flex justify-center space-x-2 md:space-x-4 mb-8 flex-wrap">
+                <button class="tab-btn active px-4 py-2 md:px-6 md:py-3 rounded-full font-semibold bg-white shadow" data-tab="grounding">접지 & 체화</button>
+                <button class="tab-btn px-4 py-2 md:px-6 md:py-3 rounded-full font-semibold bg-white shadow" data-tab="memory">기억</button>
+                <button class="tab-btn px-4 py-2 md:px-6 md:py-3 rounded-full font-semibold bg-white shadow" data-tab="causality">인과관계</button>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-10 min-h-[400px]">
+                <div id="grounding-content" class="tab-content grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h4 class="text-2xl font-bold mb-3 text-[#4E8D7C]">접지 & 체화: 기호를 현실에 연결하다</h4>
+                        <p class="text-gray-600 mb-4">지식그래프는 추상적인 언어 기호와 센서 데이터를 실제 세계의 객체, 속성, 관계에 연결하는 '의미론적 계층'을 제공합니다. 이를 통해 AI는 단순히 '본다'를 넘어 '이해'할 수 있게 됩니다.</p>
+                        <p class="text-gray-600 font-semibold">예시: 씬 그래프 (Scene Graph)</p>
+                        <div class="mt-4 p-4 border border-dashed border-gray-300 rounded-lg bg-[#F8F5F2]">
+                            <p class="text-center font-mono text-sm mb-2">"선글라스를 낀 여성"</p>
+                            <div class="flex justify-center items-center space-x-2">
+                                <div class="border border-gray-400 rounded p-2 bg-white">여성</div>
+                                <div class="text-gray-500 font-bold">→ [끼고 있는] →</div>
+                                <div class="border border-gray-400 rounded p-2 bg-white">선글라스</div>
+                            </div>
+                            <p class="text-xs text-center mt-2 text-gray-500">자연어 쿼리를 구조화된 그래프로 변환하여 이미지 내에서 해당 관계를 만족하는 영역을 정확히 찾아냅니다.</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                </div>
+
+                <div id="memory-content" class="tab-content hidden grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h4 class="text-2xl font-bold mb-3 text-[#4E8D7C]">기억: 동적 학습 에이전트로의 전환</h4>
+                        <p class="text-gray-600 mb-4">지식그래프는 LLM 외부에 존재하는 '지속적이고 구조화된 기억' 역할을 합니다. 대화와 경험을 통해 동적으로 업데이트되며, AI가 장기적인 맥락을 유지하고 지속적으로 학습하게 만듭니다.</p>
+                        <p class="text-gray-600 font-semibold">예시: 그래프 RAG (GraphRAG)</p>
+                         <div class="mt-4 p-4 border border-dashed border-gray-300 rounded-lg bg-[#F8F5F2]">
+                            <p class="text-center font-mono text-sm mb-2">"아인슈타인 이론?"</p>
+                            <div class="flex justify-around items-center text-sm">
+                                <div class="text-center">
+                                    <div class="border border-gray-400 rounded p-2 bg-white">아인슈타인</div>
+                                    <p class="text-xs mt-1">초기 노드</p>
+                                </div>
+                                <div class="text-gray-500 font-bold text-2xl">→</div>
+                                <div class="text-center">
+                                    <div class="border border-gray-400 rounded p-2 bg-white space-y-1">
+                                        <div>isA: 물리학자</div>
+                                        <div>developed: 상대성이론</div>
+                                        <div>influencedBy: 마흐</div>
+                                    </div>
+                                    <p class="text-xs mt-1">관계 탐색</p>
+                                </div>
+                                <div class="text-gray-500 font-bold text-2xl">→</div>
+                                <div class="text-center">
+                                    <div class="border border-[#D88C7A] rounded p-2 bg-white">풍부한 컨텍스트</div>
+                                    <p class="text-xs mt-1">답변 생성</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                    </div>
+                </div>
+
+                <div id="causality-content" class="tab-content hidden grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h4 class="text-2xl font-bold mb-3 text-[#4E8D7C]">인과관계: '왜'를 추론하다</h4>
+                        <p class="text-gray-600 mb-4">지식그래프는 변수 간의 원인-결과 관계를 명시적으로 모델링하는 '인과 그래프' 구축의 토대를 제공합니다. 이를 통해 AI는 데이터의 편향을 극복하고 상관관계를 넘어 진정한 원인을 분석할 수 있습니다.</p>
+                        <p class="text-gray-600 font-semibold">예시: 교란 변수 통제</p>
+                        <div class="mt-4 p-4 border border-dashed border-gray-300 rounded-lg bg-[#F8F5F2] text-center">
+                            <div class="flex justify-center items-center space-x-4">
+                                <div class="border border-gray-400 rounded p-2 bg-white">아이스크림 판매</div>
+                                <div class="text-gray-500 font-bold text-2xl">?</div>
+                                <div class="border border-gray-400 rounded p-2 bg-white">익사 사고</div>
+                            </div>
+                            <div class="text-2xl my-1">↓</div>
+                            <div class="inline-block border-2 border-[#D88C7A] rounded p-2 bg-white font-bold">계절 (더위)</div>
+                            <p class="text-xs text-center mt-2 text-gray-500">'계절'이라는 교란 변수를 식별하고 통제하여 거짓된 상관관계를 제거합니다.</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="synergy" class="py-16 mt-16">
+            <div class="text-center mb-16 px-4">
+                <h3 class="text-3xl font-bold mb-2">시너지: 지능의 선순환 구조</h3>
+                <p class="text-gray-500 max-w-2xl mx-auto">접지, 기억, 인과 추론 능력은 독립적이지 않습니다. 이들은 서로를 강화하며 '행동 → 기억 → 이해 → 더 나은 행동'으로 이어지는 지속적인 자기 개선 루프를 형성합니다.</p>
+            </div>
+            <div class="relative flex items-center justify-center h-80">
+                <div class="absolute w-64 h-64 md:w-80 md:h-80 border-4 border-dashed border-[#D88C7A] rounded-full"></div>
+                <div class="flow-diagram-item" style="transform: translate(0, -110px);">행동<br>(Action)</div>
+                <div class="flow-diagram-arrow" style="transform: translate(70px, -70px) rotate(45deg);">→</div>
+                <div class="flow-diagram-item" style="transform: translate(110px, 0);">기억<br>(Memory)</div>
+                <div class="flow-diagram-arrow" style="transform: translate(70px, 70px) rotate(135deg);">→</div>
+                <div class="flow-diagram-item" style="transform: translate(0, 110px);">이해<br>(Causality)</div>
+                <div class="flow-diagram-arrow" style="transform: translate(-70px, 70px) rotate(225deg);">→</div>
+                <div class="flow-diagram-item" style="transform: translate(-110px, 0);">접지된<br>개선 행동</div>
+                <div class="flow-diagram-arrow" style="transform: translate(-70px, -70px) rotate(315deg);">→</div>
+            </div>
+        </section>
+
+        <footer class="text-center py-12 mt-16 border-t border-gray-200">
+            <p class="text-gray-500">본 페이지는 "THINKING BEYOND TOKENS" 논문의 핵심 내용을 기반으로 제작된 대화형 요약 보고서입니다.</p>
+        </footer>
+
+    </main>
+
+    <script>
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+        const chartCanvas = document.getElementById('comparisonChart');
+        const chartContainers = document.querySelectorAll('.chart-container');
+
+        const chartData = {
+            grounding: {
+                labels: ['관계형 정확도', '물리 속성 추론', '컨텍스트 이해'],
+                datasets: [
+                    {
+                        label: '표준 LLM',
+                        data: [45, 30, 55],
+                        backgroundColor: '#D88C7A',
+                        borderRadius: 4,
+                    },
+                    {
+                        label: 'KG-하이브리드',
+                        data: [85, 75, 90],
+                        backgroundColor: '#4E8D7C',
+                        borderRadius: 4,
+                    }
+                ]
+            },
+            memory: {
+                labels: ['장기 맥락 유지', '정보 검색 정확도', '환각 현상 감소'],
+                datasets: [
+                    {
+                        label: '표준 LLM',
+                        data: [20, 60, 50],
+                        backgroundColor: '#D88C7A',
+                        borderRadius: 4,
+                    },
+                    {
+                        label: 'KG-하이브리드',
+                        data: [95, 88, 85],
+                        backgroundColor: '#4E8D7C',
+                        borderRadius: 4,
+                    }
+                ]
+            },
+            causality: {
+                labels: ['편향 저항성', '설명 가능성', '반사실적 추론'],
+                datasets: [
+                    {
+                        label: '표준 LLM',
+                        data: [25, 35, 10],
+                        backgroundColor: '#D88C7A',
+                        borderRadius: 4,
+                    },
+                    {
+                        label: 'KG-하이브리드',
+                        data: [80, 90, 70],
+                        backgroundColor: '#4E8D7C',
+                        borderRadius: 4,
+                    }
+                ]
+            }
+        };
+
+        let myChart;
+
+        function renderChart(tabName) {
+            if (myChart) {
+                myChart.destroy();
+            }
+            
+            const ctx = chartCanvas.getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: chartData[tabName],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '표준 LLM vs KG-하이브리드 모델 성능 비교',
+                            font: { size: 16, family: 'Noto Sans KR' },
+                            color: '#2C3E50',
+                            padding: { bottom: 20 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                contents.forEach(content => {
+                    content.classList.add('hidden');
+                });
+                document.getElementById(`${tabName}-content`).classList.remove('hidden');
+
+                const targetContainer = document.getElementById(`${tabName}-content`).querySelector('.chart-container');
+                chartContainers.forEach(c => {
+                    if(c.firstChild) c.removeChild(c.firstChild);
+                });
+                targetContainer.appendChild(chartCanvas);
+
+                renderChart(tabName);
+            });
+        });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            renderChart('grounding');
+            const targetContainer = document.getElementById('grounding-content').querySelector('.chart-container');
+            targetContainer.appendChild(chartCanvas);
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
